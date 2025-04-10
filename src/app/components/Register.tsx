@@ -35,7 +35,6 @@ export function Register() {
         const newErrors: FormErrors = {};
         let isValid = true;
 
-        // Validasi umum
         if (!formData.username || formData.username.length < 4) {
             newErrors.username = 'Username minimal 4 karakter';
             isValid = false;
@@ -53,7 +52,6 @@ export function Register() {
             isValid = false;
         }
 
-        // Validasi berdasarkan role
         if (formData.role === 'siswa') {
             if (!formData.nama_siswa) {
                 newErrors.nama_siswa = 'Nama siswa wajib diisi';
@@ -84,7 +82,6 @@ export function Register() {
         setLoading(true);
 
         try {
-            // Buat payload berdasarkan role yang dipilih
             const payload = {
                 username: formData.username,
                 password: formData.password,

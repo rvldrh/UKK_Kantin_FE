@@ -1,31 +1,88 @@
 import api from '@/app/utils/axios';
-import { getHeaders, createServiceURL } from '@/app/services/serviceHelper';
-import type { Transaksi } from '../types';
+import { BASE_URL, handleForbiddenError } from '../utils/auth';
+import { getHeaders } from './serviceHelper';
+const TRANSAKSI_URL = `${BASE_URL}/transaksi`;
 
-const TRANSAKSI_URL = createServiceURL('transaksi');
 
-export const transaksiService = {
-    getAll: async () => {
-        const response = await api.get(TRANSAKSI_URL, getHeaders());
-        return response.data;
-    },
-
-    getById: async (id: string) => {
-        const response = await api.get(`${TRANSAKSI_URL}/${id}`, getHeaders());
-        return response.data;
-    },
-
-    create: async (transaksiData: Partial<Transaksi>) => {
-        const response = await api.post(TRANSAKSI_URL, transaksiData, getHeaders());
-        return response.data;
-    },
-
-    updateStatus: async (id: string, status: Transaksi['status']) => {
-        const response = await api.put(
-            `${TRANSAKSI_URL}/${id}/status`, 
-            { status }, 
-            getHeaders()
-        );
-        return response.data;
+export const TransaksiService = {
+  async getAll() {
+    try {
+      const response = await api.get(TRANSAKSI_URL, getHeaders());
+      return response.data;
+    } catch (error) {
+      handleForbiddenError(error);
     }
-}; 
+  },
+
+  async getById(id: string) {
+    try {
+      const response = await api.get(`${TRANSAKSI_URL}/${id}`, getHeaders());
+      return response.data;
+    } catch (error) {
+      handleForbiddenError(error);
+    }
+  },
+
+  async getBySiswaId() {
+    try {
+      const response = await api.get(`${TRANSAKSI_URL}/siswa`, getHeaders());
+      return response.data;
+    } catch (error) {
+      handleForbiddenError(error);
+    }
+  },
+
+  async create(transaksiData: Partial<Transaksi>) {
+    try {
+      const response = await api.post(TRANSAKSI_URL, transaksiData, getHeaders());
+      return response.data;
+    } catch (error) {
+      handleForbiddenError(error);
+    }
+  },
+
+  async getByStan() {
+    try {
+      const response = await api.get(`${TRANSAKSI_URL}/stan`, getHeaders());
+      return response.data;
+    } catch (error) {
+      handleForbiddenError(error);
+    }
+  },
+
+  async updateStatus(id: string, status: Transaksi['status']) {
+    try {
+      const response = await api.patch(`${TRANSAKSI_URL}/status/${id}`, { status }, getHeaders());
+      return response.data;
+    } catch (error) {
+      handleForbiddenError(error);
+    }
+  },
+
+  async getByBulan(bulan: number) {
+    try {
+      const response = await api.get(`${TRANSAKSI_URL}/bulan/${bulan}`, getHeaders());
+      return response.data;
+    } catch (error) {
+      handleForbiddenError(error);
+    }
+  },
+
+  async delete(id: string) {
+    try {
+      const response = await api.delete(`${TRANSAKSI_URL}/${id}`, getHeaders());
+      return response.data;
+    } catch (error) {
+      handleForbiddenError(error);
+    }
+  },
+
+  async getPemasukanBulanAdmin(bulan: number) {
+    try {
+      const response = await api.get(`${TRANSAKSI_URL}/pemasukan/${bulan}`, getHeaders());
+      return response.data;
+    } catch (error) {
+      handleForbiddenError(error);
+    }
+  },
+};

@@ -1,37 +1,71 @@
 import api from '@/app/utils/axios';
 import { getHeaders, createServiceURL } from '@/app/services/serviceHelper';
 import type { Diskon } from '../types';
+import { handleForbiddenError } from '../utils/auth';
 
 const DISKON_URL = createServiceURL('diskon');
 
 export const diskonService = {
     getAll: async () => {
-        const response = await api.get(DISKON_URL, getHeaders());
-        return response.data;
+        try {
+            const response = await api.get(DISKON_URL, getHeaders());
+            return response.data;
+        } catch (error) {
+            handleForbiddenError(error);
+        }
     },
 
     getActive: async () => {
-        const response = await api.get(`${DISKON_URL}/active`, getHeaders());
-        return response.data;
+        try {
+            const response = await api.get(`${DISKON_URL}/active`, getHeaders());
+            return response.data;
+        } catch (error) {
+            handleForbiddenError(error);
+        }
     },
 
     getById: async (id: string) => {
-        const response = await api.get(`${DISKON_URL}/${id}`, getHeaders());
-        return response.data;
+        try {
+            const response = await api.get(`${DISKON_URL}/${id}`, getHeaders());
+            return response.data;
+        } catch (error) {
+            handleForbiddenError(error);
+        }
     },
 
     create: async (diskonData: Partial<Diskon>) => {
-        const response = await api.post(DISKON_URL, diskonData, getHeaders());
-        return response.data;
+        try {
+            const response = await api.post(DISKON_URL, diskonData, getHeaders());
+            return response.data;
+        } catch (error) {
+            handleForbiddenError(error);
+        }
     },
 
     update: async (id: string, diskonData: Partial<Diskon>) => {
-        const response = await api.put(`${DISKON_URL}/${id}`, diskonData, getHeaders());
-        return response.data;
+        try {
+            const response = await api.patch(`${DISKON_URL}/${id}`, diskonData, getHeaders());
+            return response.data;
+        } catch (error) {
+            handleForbiddenError(error);
+        }
     },
 
     delete: async (id: string) => {
-        const response = await api.delete(`${DISKON_URL}/${id}`, getHeaders());
-        return response.data;
+        try {
+            const response = await api.delete(`${DISKON_URL}/${id}`, getHeaders());
+            return response.data;
+        } catch (error) {
+            handleForbiddenError(error);
+        }
+    },
+
+    getByStanId: async () => {
+        try {
+            const response = await api.get(`${DISKON_URL}/stan`, getHeaders());
+            return response.data;
+        } catch (error) {
+            handleForbiddenError(error);
+        }
     }
-}; 
+};

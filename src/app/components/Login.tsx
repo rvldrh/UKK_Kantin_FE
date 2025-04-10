@@ -22,32 +22,35 @@ export function Login() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-
+      
         try {
-            const response = await authService.login(formData);
-            
-            if (response.token) {
-                // Simpan token dan user info
-                localStorage.setItem('token', response.token);
-                localStorage.setItem('user', JSON.stringify(response.data.user));
+          const response = await authService.login(formData);
+      
+          if (response?.data?.token) {
+            localStorage.setItem('token', response?.data?.token);
+            if (response?.data?.user) {
+                localStorage.setItem("user", JSON.stringify(response.data?.user));
+                localStorage.setItem("isLoginn", "true");
+                window.dispatchEvent(new Event("storage"));
                 
+                const userRole = response.data.user.role;
                 toast.success('Login berhasil!');
                 
-                // Redirect berdasarkan role
-                if (response.data.user.role === 'admin_stan') {
-                    router.push('/admin/dashboard');
+                if (userRole === 'siswa') {
+                    router.push('/pages/menu');
                 } else {
-                    router.push('/siswa/menu');
+                    router.push('/pages/admin/dashboard');
                 }
             }
+          }
         } catch (err: any) {
-            toast.error(err.response?.data?.message || 'Gagal masuk ke akun');
-            console.error('Login error:', err);
+          toast.error(err.response?.data?.message || 'Gagal masuk ke akun');
+          console.error('Login error:', err);
         } finally {
-            setLoading(false);
+          setLoading(false);
         }
-    };
-
+      };
+      
     return (
         <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
             <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8">

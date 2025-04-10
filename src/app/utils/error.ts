@@ -14,6 +14,5 @@ export const getErrorMessage = (error: unknown): string => {
 
 export const handleApiError = (error: unknown): void => {
   const message = getErrorMessage(error);
-  // Tambahkan toast notification atau alert disini
   console.error(message);
 }; 
