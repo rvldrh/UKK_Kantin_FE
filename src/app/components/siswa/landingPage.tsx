@@ -84,7 +84,7 @@ export const LandingPage = () => {
                   >
                     {diskon && (
                       <div className="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-lg shadow-md z-10">
-                        -{Math.round(diskon * 10)}%
+                        -{Math.round(diskon)}%
                       </div>
                     )}
 
@@ -136,7 +136,6 @@ export const LandingPage = () => {
           </div>
         ))}
 
-      {/* Modal Berhasil Pesan */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-6 rounded-lg shadow-lg text-center">

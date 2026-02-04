@@ -18,8 +18,8 @@ export function Navbar() {
       setIsLoggedIn(loginStatus === "true");
       
       const user = JSON.parse(localStorage.getItem("user"));
-      if (user && user.foto) {
-        setProfilePic(user.foto);
+      if (user && user?.profile?.foto) {
+        setProfilePic(user?.profile?.foto);
       } else {
         setProfilePic(null);
       }
@@ -64,11 +64,16 @@ export function Navbar() {
             {isLoggedIn ? (
               <div className="flex items-center space-x-4">
                 <Link href="/pages/profileUser">
-                  {profilePic ? (
-                    <img src={profilePic} alt="Profile" className="w-10 h-10 rounded-full border border-gray-300" />
-                  ) : (
-                    <UserCircle className="w-10 h-10 text-gray-500" />
-                  )}
+                {profilePic ? (
+  <img
+    src={`/img/siswaImg/${profilePic}`}
+    alt="Profile"
+    className="w-10 h-10 rounded-full border border-gray-300 object-cover"
+  />
+) : (
+  <UserCircle className="w-10 h-10 text-gray-500" />
+)}
+
                 </Link>
                 <button className="bg-orange-500 text-white px-3 py-2 rounded-md text-base font-medium hover:bg-orange-600" onClick={() => setIsModalOpen(true)}>
                   Keluar

@@ -44,6 +44,9 @@
                   <strong>ID Transaksi:</strong> {transaksi._id}
                 </p>
                 <p>
+                  <strong>Nama Siswa:</strong> {transaksi?.id_siswa?.nama_siswa}
+                </p>
+                <p>
                   <strong>Status:</strong> {transaksi.status}
                 </p>
               </div>

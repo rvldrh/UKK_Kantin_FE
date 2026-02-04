@@ -26,8 +26,8 @@ export const DiskonList = () => {
   const [openAdd, setOpenAdd] = useState(false);
 
   const [newDiskon, setNewDiskon] = useState({
-    nama: "",
-    persentase: "",
+    nama_diskon: "",
+    persentase_diskon: "",
     tanggal_awal: "",
     tanggal_akhir: "",
   });
@@ -47,17 +47,33 @@ export const DiskonList = () => {
       toast.success("Diskon berhasil ditambahkan");
       queryClient.invalidateQueries(["diskonList"]);
       setOpenAdd(false);
-      setNewDiskon({
-        nama: "",
-        persentase: "",
-        tanggal_awal: "",
-        tanggal_akhir: "",
-      });
+      resetForm();
     },
     onError: () => {
       toast.error("Gagal menambahkan diskon");
     },
   });
+
+  const resetForm = () => {
+    setNewDiskon({
+      nama_diskon: "",
+      persentase_diskon: "",
+      tanggal_awal: "",
+      tanggal_akhir: "",
+    });
+  };
+
+  const handleSubmit = () => {
+    const toISOString = (localDateTime) =>
+      new Date(localDateTime).toISOString();
+
+    createDiskonMutation.mutate({
+      nama_diskon: newDiskon.nama_diskon,
+      persentase_diskon: parseFloat(newDiskon.persentase_diskon),
+      tanggal_awal: toISOString(newDiskon.tanggal_awal),
+      tanggal_akhir: toISOString(newDiskon.tanggal_akhir),
+    });
+  };
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString("id-ID", {
@@ -74,31 +90,35 @@ export const DiskonList = () => {
         Daftar Diskon
       </Typography>
       {isLoading ? (
-        <CircularProgress />
-      ) : (
-        <TableContainer component={Paper} className="mt-4">
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Nama Diskon</TableCell>
-                <TableCell>Persentase</TableCell>
-                <TableCell>Tanggal Awal</TableCell>
-                <TableCell>Tanggal Akhir</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {diskonList?.data?.map((diskon) => (
-                <TableRow key={diskon._id}>
-                  <TableCell>{diskon.nama_diskon}</TableCell>
-                  <TableCell>{diskon.persentase_diskon}%</TableCell>
-                  <TableCell>{formatDate(diskon.tanggal_awal)}</TableCell>
-                  <TableCell>{formatDate(diskon.tanggal_akhir)}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
+  <CircularProgress />
+) : diskonList?.data?.length === 0 ? (
+  <Typography align="center" color="textSecondary" className="mt-6">
+    Belum ada diskon yang tersedia.
+  </Typography>
+) : (
+  <TableContainer component={Paper} className="mt-4">
+    <Table>
+      <TableHead>
+        <TableRow>
+          <TableCell>Nama Diskon</TableCell>
+          <TableCell>Persentase</TableCell>
+          <TableCell>Tanggal Awal</TableCell>
+          <TableCell>Tanggal Akhir</TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {diskonList?.data?.map((diskon) => (
+          <TableRow key={diskon._id}>
+            <TableCell>{diskon.nama_diskon}</TableCell>
+            <TableCell>{diskon.persentase_diskon}%</TableCell>
+            <TableCell>{formatDate(diskon.tanggal_awal)}</TableCell>
+            <TableCell>{formatDate(diskon.tanggal_akhir)}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  </TableContainer>
+)}
 
       <Button
         variant="contained"
@@ -115,9 +135,9 @@ export const DiskonList = () => {
             label="Nama Diskon"
             fullWidth
             margin="dense"
-            value={newDiskon.nama}
+            value={newDiskon.nama_diskon}
             onChange={(e) =>
-              setNewDiskon({ ...newDiskon, nama: e.target.value })
+              setNewDiskon({ ...newDiskon, nama_diskon: e.target.value })
             }
           />
           <TextField
@@ -125,9 +145,12 @@ export const DiskonList = () => {
             fullWidth
             margin="dense"
             type="number"
-            value={newDiskon.persentase}
+            value={newDiskon.persentase_diskon}
             onChange={(e) =>
-              setNewDiskon({ ...newDiskon, persentase: e.target.value })
+              setNewDiskon({
+                ...newDiskon,
+                persentase_diskon: e.target.value,
+              })
             }
           />
           <TextField
@@ -139,12 +162,11 @@ export const DiskonList = () => {
             onChange={(e) =>
               setNewDiskon({
                 ...newDiskon,
-                tanggal_awal: new Date(e.target.value).toISOString(),
+                tanggal_awal: e.target.value,
               })
             }
-            InputLabelProps={{ shrink: true }} 
+            InputLabelProps={{ shrink: true }}
           />
-
           <TextField
             label="Tanggal Akhir"
             fullWidth
@@ -154,18 +176,15 @@ export const DiskonList = () => {
             onChange={(e) =>
               setNewDiskon({
                 ...newDiskon,
-                tanggal_akhir: new Date(e.target.value).toISOString(),
+                tanggal_akhir: e.target.value,
               })
             }
-            InputLabelProps={{ shrink: true }} 
+            InputLabelProps={{ shrink: true }}
           />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpenAdd(false)}>Batal</Button>
-          <Button
-            onClick={() => createDiskonMutation.mutate(newDiskon)}
-            color="primary"
-          >
+          <Button onClick={handleSubmit} color="primary">
             Simpan
           </Button>
         </DialogActions>

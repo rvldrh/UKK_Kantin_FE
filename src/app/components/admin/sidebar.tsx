@@ -19,7 +19,6 @@ export const Sidebar = ({ children }) => {
 
   return (
     <div className="flex h-screen w-full">
-      {/* Sidebar */}
       <div
         className={`fixed left-0 top-0 h-full bg-gray-900 text-white flex flex-col transition-all duration-300 z-50 ${
           isOpen ? "w-64" : "w-20"
@@ -55,12 +54,6 @@ export const Sidebar = ({ children }) => {
             href="/pages/admin/pelanggan"
             icon={<Users size={20} />}
             label="Pelanggan"
-            isOpen={isOpen}
-          />
-          <SidebarItem
-            href="/pages/admin/settings"
-            icon={<Settings size={20} />}
-            label="Settings"
             isOpen={isOpen}
           />
         </nav>

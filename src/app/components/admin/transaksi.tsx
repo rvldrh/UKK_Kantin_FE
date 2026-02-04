@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { TransaksiService } from "@/app/services/transaksi.service";
 
@@ -44,6 +44,15 @@ export const TransaksiTable = () => {
     staleTime: 1000 * 60 * 5,
   });
 
+  const { data: allTransaksi } = useQuery({
+    queryKey: ["allTransaksi"],
+    queryFn: async () => {
+      const response = await TransaksiService.getAll();
+      return response?.data?.transaksi || [];
+    },
+    staleTime: 1000 * 60 * 5,
+  });
+
   const { data: pemasukan, isLoading: isLoadingPemasukan } = useQuery({
     queryKey: ["pemasukan", selectedMonth],
     queryFn: async () => {
@@ -62,13 +71,20 @@ export const TransaksiTable = () => {
     staleTime: 1000 * 60 * 5,
   });
 
-  console.log(pemasukan);
+  const availableMonths = useMemo(() => {
+    if (!allTransaksi || allTransaksi.length === 0) return [];
+    const months = new Set(
+      allTransaksi.map((item) => new Date(item.tanggal).getMonth() + 1)
+    );
+    return bulanOptions.filter((bulan) => months.has(bulan.value));
+  }, [allTransaksi]);
 
   const updateStatusMutation = useMutation({
     mutationFn: ({ id, status }: { id: string; status: string }) =>
       TransaksiService.updateStatus(id, status),
     onSuccess: () => {
       queryClient.invalidateQueries(["transaksi"]);
+      queryClient.invalidateQueries(["allTransaksi"]);
     },
   });
 
@@ -76,6 +92,7 @@ export const TransaksiTable = () => {
     mutationFn: (id: string) => TransaksiService.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries(["transaksi"]);
+      queryClient.invalidateQueries(["allTransaksi"]);
       setShowModal(false);
     },
   });
@@ -116,13 +133,34 @@ export const TransaksiTable = () => {
           {isLoadingPemasukan ? (
             <span className="font-semibold text-green-700">Loading...</span>
           ) : selectedMonth ? (
-            <span className="font-semibold text-green-700">
-              Total pemasukan bulan ini: Rp {pemasukan.toLocaleString()}
-            </span>
+            pemasukan > 0 ? (
+              <>
+                <span className="font-semibold text-green-700">
+                  Total pemasukan bulan ini: Rp {pemasukan.toLocaleString()}
+                </span>
+                <p className="text-sm text-green-600 mt-1">
+                  Pemasukan hanya dihitung berdasarkan status yang sudah sampai
+                </p>
+              </>
+            ) : (
+              <>
+                <span className="font-semibold text-gray-600">
+                  Belum ada transaksi yang berstatus sampai pada bulan ini
+                </span>
+                <p className="text-sm text-green-600 mt-1">
+                  Pemasukan hanya dihitung berdasarkan status yang sudah sampai
+                </p>
+              </>
+            )
           ) : (
-            <span className="text-gray-600 font-semibold ">
-              Silakan pilih bulan untuk melihat total pemasukan bulan tersebut
-            </span>
+            <>
+              <span className="text-gray-600 font-semibold">
+                Silakan pilih bulan untuk melihat total pemasukan bulan tersebut
+              </span>
+              <p className="text-sm text-green-600 mt-1">
+                Pemasukan hanya dihitung berdasarkan status yang sudah sampai
+              </p>
+            </>
           )}
         </div>
       </div>
@@ -156,7 +194,7 @@ export const TransaksiTable = () => {
           value={selectedMonth ?? ""}
         >
           <option value="">Semua Bulan</option>
-          {bulanOptions.map((bulan) => (
+          {availableMonths.map((bulan) => (
             <option key={bulan.value} value={bulan.value}>
               {bulan.label}
             </option>
